@@ -10,7 +10,7 @@ import { App } from './components';
 render(
 	(
 		<div>
-			<App/>
+			<App io={socket}/>
 		</div>
 	),
 	document.getElementById('root')

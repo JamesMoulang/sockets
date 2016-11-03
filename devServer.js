@@ -21,8 +21,15 @@ app.get('*', function(req, res) {
 
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
-io.on('connection', function(){
-	console.log("a user connected.");
+io.on('connection', function(socket){
+	console.log('a user connected');
+	socket.on('chat message', function(msg){
+		console.log('message: ' + msg);
+		io.emit('chat message', msg);
+	});
+	socket.on('disconnect', function(){
+		console.log('user disconnected');
+	});
 });
 server.listen(3000, function() {
 	console.log("listening on port 3000");
