@@ -1,76 +1,68 @@
 import React, { Component } from 'react';
 import _ from 'underscore';
 import Scroll from 'react-scroll';
+import { Game } from '../../Game';
 
 class AppComponent extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			msg: '',
-			messages: []
+			messages: [],
+			id: null,
+			players: [],
+			game: null
 		}
-		this.handleChange = this.handleChange.bind(this);
-		this.handleSubmit = this.handleSubmit.bind(this);
-		this.handleKeyPress = this.handleKeyPress.bind(this);
 
-		props.io.on('chat message', (msg) => {
-			var messages = _.map(this.state.messages, _.clone);
-			messages.push(msg);
-			this.setState({messages});
-		});
+		props.io.on('login', (data) => {
+			this.setState({id: data.id, players: data.players});
+		})
+
+		props.io.on('create player', this.createPlayer.bind(this));
+		props.io.on('remove player', this.removePlayer.bind(this));
 	}
 
-	handleChange(event) {
-		this.setState({msg: event.target.value});
+	move(id, x, y) {
+		this.props.io.emit(
+			'move', 
+			{
+				x, y,
+				id: this.state.id
+			}
+		);
 	}
 
-	handleKeyPress(event) {
-		if (event.key === 'Enter') {
-			this.handleSubmit();
-		}
+	removePlayer(id) {
+		var players = _.filter(this.state.players, (p) => {
+			return p.id != id;
+		})
+		this.setState({players});
 	}
 
-	handleSubmit() {
-		if (this.state.msg.length > 0) {
-			console.log('Text field value is: ' + this.state.msg);
-	    	this.props.io.emit('chat message', this.state.msg);
-	    	this.setState({msg: ''})
-		}
+	createPlayer(id) {
+		var players = _.map(this.state.players, _.clone);
+		players.push({id, x: 0, y: 0});
+		this.setState({players});
 	}
 
 	componentDidUpdate() {
 		Scroll.animateScroll.scrollToBottom();
 	}
 
+	componentDidMount() {
+
+	}
+
 	render() {
 		return (
-			<div style={{position: 'absolute', width: '100%', height: '100%', overflow: 'scroll'}}>
-				<div className="container" style={{overflow: 'scroll', height: '100%'}}>
-				  {this.state.messages.map((m) => {
-				  	return <p className="lead">{m}</p>;
-				  })}
+			<div>
+				<div className="container">
+					<h1>{this.state.id}</h1>
+					{this.state.players.map((p) => {
+						return <h2>{p.id + ": " + p.x + ", " + p.y}</h2>;
+					})}
 				</div>
-				<footer className="footer">
-					<div className="container">
-						<div className="row">
-							<div className="col-sm-12">
-								<div className="input-group">
-									<input 
-										type="text" 
-										className="form-control" 
-										placeholder="Your message..."
-										value={this.state.msg}
-          								onChange={this.handleChange}
-          								onKeyPress={this.handleKeyPress}
-									/>
-									<span className="input-group-btn">
-										<button onClick={this.handleSubmit} className="btn btn-default" type="button">Send!</button>
-									</span>
-								</div>
-							</div>
-						</div>
-					</div>
-				</footer>
+				<div id="content"></div>
 			</div>
 		)
 	}

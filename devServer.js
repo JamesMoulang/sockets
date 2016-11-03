@@ -2,6 +2,8 @@ var path = require('path');
 var express = require('express');
 var webpack = require('webpack');
 var config = require('./webpack.config.js');
+var uid = require('uid');
+var _ = require('underscore');
 
 var app = express();
 var compiler = webpack(config);
@@ -21,14 +23,26 @@ app.get('*', function(req, res) {
 
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+
+var players = [];
+
 io.on('connection', function(socket){
-	console.log('a user connected');
+	var id = uid();
+	console.log("user " +id + " connected.");
+	socket.emit('login', {id, players});
+	socket.broadcast.emit('create player', id);
+	players.push({id, x: 0, y: 0});
+
 	socket.on('chat message', function(msg){
 		console.log('message: ' + msg);
 		io.emit('chat message', msg);
 	});
 	socket.on('disconnect', function(){
 		console.log('user disconnected');
+		socket.broadcast.emit('remove player', id);
+		players = _.filter(players, (p) => {
+			return p.id != id;
+		});
 	});
 });
 server.listen(3000, function() {
