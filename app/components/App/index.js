@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import _ from 'underscore';
 import Scroll from 'react-scroll';
-import { Game } from '../../Game';
+import Game from '../../Game';
 
 class AppComponent extends Component {
 	constructor(props) {
@@ -50,18 +50,13 @@ class AppComponent extends Component {
 	}
 
 	componentDidMount() {
-
+		var game = new Game(this.props.io);
+		this.setState({game});
 	}
 
 	render() {
 		return (
 			<div>
-				<div className="container">
-					<h1>{this.state.id}</h1>
-					{this.state.players.map((p) => {
-						return <h2>{p.id + ": " + p.x + ", " + p.y}</h2>;
-					})}
-				</div>
 				<div id="content"></div>
 			</div>
 		)

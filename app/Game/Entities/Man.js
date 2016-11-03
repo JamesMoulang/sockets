@@ -5,9 +5,10 @@ import "phaser";
 import Vector from '../Helpers/Vector';
 import QuadrantSprite from './QuadrantSprite';
 
-class Man extends QuadrantSprite {
-	constructor(game, grid, x, y) {
-		super(game, grid, x, y, 'man_hitbox', 'man');
+class Man extends Phaser.Sprite {
+	constructor(game, x, y) {
+		super(game, x, y, 'man_hitbox');
+		this.pos = new Vector(x, y);
 		game.world.add(this);
 		this.anchor.set(0.5, 1);
 		this.facing = new Vector(1, 0);
@@ -94,15 +95,10 @@ class Man extends QuadrantSprite {
 		}
 
 		this.updateDisplayPos();
-
-		this.grid.forAllEntities(this, 1, 'leaf', function(leaf) {
-			leaf.destroy();
-		});
 	}
 
 	updateWorldPos(pos) {
 		this.pos = pos;
-		this.updateCellPosition();
 	}
 
 	updateDisplayPos() {
