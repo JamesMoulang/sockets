@@ -11,7 +11,8 @@ class AppComponent extends Component {
 			messages: [],
 			id: null,
 			players: [],
-			game: null
+			game: null,
+			gameCanvas: null
 		}
 	}
 
@@ -42,15 +43,39 @@ class AppComponent extends Component {
 		Scroll.animateScroll.scrollToBottom();
 	}
 
+	sendMessage(msg) {
+
+	}
+
 	componentDidMount() {
-		var game = new Game(this.props.io);
+		var game = new Game();
+		game.sendMessage = this.sendMessage.bind(this);
 		this.setState({game});
+
+		document.addEventListener('keydown', function(e) {
+			var msg = _.clone(this.state.msg);
+			console.log(e.key);
+			if ("abcdefghijklmnopqrstuvwxyz .,:;!?#'".indexOf(e.key.toLowerCase()) > -1) {
+				msg += e.key;
+			} else if (e.key == 'Backspace') {
+				e.preventDefault();
+				msg = msg.substring(0, msg.length - 1);
+			} else if (e.key == 'Enter') {
+
+			}
+
+			this.setState({msg});
+		}.bind(this));
 	}
 
 	render() {
 		return (
 			<div>
-				<div id="content"></div>
+				{this.state.msg.length ? 
+				<div className="textInputBox text-center">
+					<h1>{this.state.msg}</h1>
+				</div> : null}
+				<div ref="content" id="content"></div>
 			</div>
 		)
 	}
