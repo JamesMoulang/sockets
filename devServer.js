@@ -29,7 +29,7 @@ var players = [];
 io.on('connection', function(socket){
 	var id = uid();
 	console.log("user " +id + " connected.");
-	socket.emit('login', {id, players});
+	socket.emit('login', {id: id, players: players});
 	socket.broadcast.emit('create player', id);
 	players.push({id, x: 120, y: 100});
 
