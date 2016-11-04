@@ -13,13 +13,6 @@ class AppComponent extends Component {
 			players: [],
 			game: null
 		}
-
-		props.io.on('login', (data) => {
-			this.setState({id: data.id, players: data.players});
-		})
-
-		props.io.on('create player', this.createPlayer.bind(this));
-		props.io.on('remove player', this.removePlayer.bind(this));
 	}
 
 	move(id, x, y) {

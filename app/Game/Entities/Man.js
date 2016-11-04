@@ -25,6 +25,8 @@ class Man extends Phaser.Sprite {
 		this.walking = false;
 		this.walkSpeed = 20;
 
+		this.depth = y;
+
 		this.updateDisplayPos();
 	}
 

@@ -31,7 +31,7 @@ io.on('connection', function(socket){
 	console.log("user " +id + " connected.");
 	socket.emit('login', {id, players});
 	socket.broadcast.emit('create player', id);
-	players.push({id, x: 0, y: 0});
+	players.push({id, x: 120, y: 100});
 
 	socket.on('chat message', function(msg){
 		console.log('message: ' + msg);
@@ -44,6 +44,9 @@ io.on('connection', function(socket){
 			return p.id != id;
 		});
 	});
+	socket.on('move', function(data) {
+		socket.broadcast.emit('move player', {id: data.id, x: data.x, y: data.y});
+	})
 });
 server.listen(3000, function() {
 	console.log("listening on port 3000");
