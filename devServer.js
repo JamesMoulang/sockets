@@ -1,9 +1,12 @@
+"use strict";
 var path = require('path');
 var express = require('express');
 var webpack = require('webpack');
 var config = require('./webpack.config.js');
 var uid = require('uid');
 var _ = require('underscore');
+
+var Game = require('./app/server');
 
 var app = express();
 var compiler = webpack(config);
@@ -24,30 +27,10 @@ app.get('*', function(req, res) {
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
 
+var GameServer = new Game(io);
+
 var players = [];
 
-io.on('connection', function(socket){
-	var id = uid();
-	console.log("user " +id + " connected.");
-	socket.emit('login', {id: id, players: players});
-	socket.broadcast.emit('create player', id);
-	players.push({id, x: 120, y: 100});
-
-	socket.on('chat message', function(msg){
-		console.log('message: ' + msg);
-		io.emit('chat message', msg);
-	});
-	socket.on('disconnect', function(){
-		console.log('user disconnected');
-		socket.broadcast.emit('remove player', id);
-		players = _.filter(players, (p) => {
-			return p.id != id;
-		});
-	});
-	socket.on('move', function(data) {
-		socket.broadcast.emit('move player', {id: data.id, x: data.x, y: data.y});
-	})
-});
 server.listen(3000, function() {
 	console.log("listening on port 3000");
 });
